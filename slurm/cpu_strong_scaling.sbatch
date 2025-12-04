@@ -2,11 +2,10 @@
 #SBATCH --job-name=nbody-cpu-strong
 #SBATCH --output=../results/cpu_strong_%j.out
 #SBATCH --error=../results/cpu_strong_%j.err
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=16
-#SBATCH --cpus-per-task=1
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=8
 #SBATCH --time=00:30:00
-#SBATCH --partition=cpu
+#SBATCH --mem-per-cpu=1G
 
 # Load modules
 module purge
@@ -38,22 +37,20 @@ OUTPUT_FREQ=20
 # Create results directory
 mkdir -p ../results
 
-# Run strong scaling tests
-for NODES in 1 2 4 8; do
+# Run strong scaling tests (varying number of MPI tasks)
+for NTASKS in 1 2 4 8 16 32; do
     echo ""
-    echo "Running with $NODES nodes..."
+    echo "Running with $NTASKS MPI tasks..."
 
-    NTASKS=$((NODES * 16))
-
-    srun --nodes=$NODES --ntasks=$NTASKS ../build/nbody \
+    srun --ntasks=$NTASKS ../build/nbody \
         --particles $N_PARTICLES \
         --steps $N_STEPS \
         --dt $DT \
         --theta $THETA \
         --freq $OUTPUT_FREQ \
-        --output ../results/strong_${NODES}nodes.vtk
+        --output ../results/strong_${NTASKS}tasks.vtk
 
-    echo "Completed $NODES nodes"
+    echo "Completed $NTASKS tasks"
 done
 
 echo ""

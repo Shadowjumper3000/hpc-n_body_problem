@@ -2,12 +2,10 @@
 #SBATCH --job-name=nbody-profile
 #SBATCH --output=../results/profile_%j.out
 #SBATCH --error=../results/profile_%j.err
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=4
-#SBATCH --gpus-per-node=4
-#SBATCH --cpus-per-task=8
+#SBATCH --nodes=1
+#SBATCH --ntasks=4
 #SBATCH --time=00:30:00
-#SBATCH --partition=gpu
+#SBATCH --mem-per-cpu=2G
 
 # Load modules
 module purge
@@ -36,7 +34,7 @@ THETA=0.5
 # CPU Profiling with perf (if available)
 echo ""
 echo "CPU Profiling with perf..."
-srun --nodes=1 --ntasks=4 --gpus-per-task=0 \
+srun --ntasks=4 \
     perf stat -e cycles,instructions,cache-references,cache-misses,branches,branch-misses \
     ../build/nbody \
     --particles $N_PARTICLES \

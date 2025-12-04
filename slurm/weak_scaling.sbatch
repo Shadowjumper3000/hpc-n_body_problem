@@ -2,11 +2,10 @@
 #SBATCH --job-name=nbody-weak
 #SBATCH --output=../results/weak_%j.out
 #SBATCH --error=../results/weak_%j.err
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=16
-#SBATCH --cpus-per-task=1
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=8
 #SBATCH --time=01:00:00
-#SBATCH --partition=cpu
+#SBATCH --mem-per-cpu=1G
 
 # Load modules
 module purge
@@ -33,25 +32,25 @@ OUTPUT_FREQ=50
 # Create results directory
 mkdir -p ../results
 
-# Run weak scaling tests (scale problem size with nodes)
-for NODES in 1 2 4 8; do
+# Run weak scaling tests (scale problem size with MPI tasks)
+for NTASKS in 1 2 4 8 16 32; do
     echo ""
-    echo "Running weak scaling with $NODES nodes..."
+    echo "Running weak scaling with $NTASKS tasks..."
 
-    NTASKS=$((NODES * 16))
-    N_PARTICLES=$((BASE_PARTICLES * NODES))
+    N_PARTICLES=$((BASE_PARTICLES * NTASKS))
 
     echo "Total particles: $N_PARTICLES"
+    echo "Tasks: $NTASKS"
 
-    srun --nodes=$NODES --ntasks=$NTASKS ../build/nbody \
+    srun --ntasks=$NTASKS ../build/nbody \
         --particles $N_PARTICLES \
         --steps $N_STEPS \
         --dt $DT \
         --theta $THETA \
         --freq $OUTPUT_FREQ \
-        --output ../results/weak_${NODES}nodes.vtk
+        --output ../results/weak_${NTASKS}tasks.vtk
 
-    echo "Completed $NODES nodes"
+    echo "Completed $NTASKS tasks"
 done
 
 echo ""

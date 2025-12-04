@@ -2,12 +2,12 @@
 #SBATCH --job-name=nbody-gpu-strong
 #SBATCH --output=../results/gpu_strong_%j.out
 #SBATCH --error=../results/gpu_strong_%j.err
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=4
-#SBATCH --gpus-per-node=4
-#SBATCH --cpus-per-task=8
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=1
+#SBATCH --gres=gpu:1
 #SBATCH --time=01:00:00
-#SBATCH --partition=gpu
+#SBATCH --partition=gpu-node
+#SBATCH --mem-per-cpu=4G
 
 # Load modules
 module purge
@@ -42,13 +42,11 @@ OUTPUT_FREQ=20
 mkdir -p ../results
 
 # Run strong scaling tests with GPUs
-for NODES in 1 2 4 8; do
+for NGPUS in 1 2; do
     echo ""
-    echo "Running with $NODES GPU nodes..."
+    echo "Running with $NGPUS GPUs..."
 
-    NTASKS=$((NODES * 4))  # 4 GPUs per node
-
-    srun --nodes=$NODES --ntasks=$NTASKS --gpus-per-task=1 \
+    srun --ntasks=$NGPUS --gres=gpu:$NGPUS \
         ../build/nbody \
         --particles $N_PARTICLES \
         --steps $N_STEPS \
@@ -56,9 +54,9 @@ for NODES in 1 2 4 8; do
         --theta $THETA \
         --gpu \
         --freq $OUTPUT_FREQ \
-        --output ../results/gpu_strong_${NODES}nodes.vtk
+        --output ../results/gpu_strong_${NGPUS}gpus.vtk
 
-    echo "Completed $NODES GPU nodes"
+    echo "Completed $NGPUS GPUs"
 done
 
 echo ""
