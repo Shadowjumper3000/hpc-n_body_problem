@@ -4,8 +4,8 @@
 #SBATCH --error=../results/test_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=4
-#SBATCH --cpus-per-task=2
 #SBATCH --time=00:10:00
+#SBATCH --mem-per-cpu=1G
 
 # Simple test run on a single node
 
@@ -13,7 +13,7 @@
 module purge
 source ../env/modules.txt
 
-export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+export OMP_NUM_THREADS=1
 
 echo "========================================="
 echo "Single Node Test Run"
