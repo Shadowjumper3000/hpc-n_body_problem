@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <cmath>
+#include <algorithm>
+#include <string>
 
 // Physical constants
 constexpr double G = 6.67430e-11;  // Gravitational constant
