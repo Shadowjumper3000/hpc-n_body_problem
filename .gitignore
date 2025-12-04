@@ -53,3 +53,73 @@ dkms.conf
 
 # debug information files
 *.dwo
+.claude
+
+# Build directories
+build/
+Build/
+cmake-build-*/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+
+# Results and output
+results/*.out
+results/*.err
+results/*.vtk
+results/*.csv
+results/profiling/
+results/plots/
+results/images/
+*.vtk
+*.hdf5
+*.h5
+
+# Slurm logs
+slurm-*.out
+slurm-*.err
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+.venv
+
+# Profiling data
+*.nvprof
+*.qdrep
+*.ncu-rep
+perf.data*
+*.vtune
+*.prof
+
+# Container images
+*.sif
+*.simg
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+core
+core.*
+
+# Data files (too large for git)
+data/*.dat
+data/*.bin
