@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --exclude=node2,node7,node8,gpu-node1,gpu-node2
 #SBATCH --exclusive
-#SBATCH --time=00:30:00
+#SBATCH --time=02:00:00
 
 # Load modules
 source ../modules.txt
