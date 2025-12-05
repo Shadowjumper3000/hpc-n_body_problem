@@ -2,14 +2,15 @@
 #SBATCH --job-name=nbody-cpu-strong
 #SBATCH --output=../results/cpu_strong_%j.out
 #SBATCH --error=../results/cpu_strong_%j.err
+#SBATCH --partition=cpubase_bycore_b1
+#SBATCH --ntasks=18
 #SBATCH --cpus-per-task=1
 #SBATCH --gres=gpu:0
 #SBATCH --exclude=node2,node7,node8
 #SBATCH --time=00:30:00
 
 # Load modules
-module purge
-source ../env/modules.txt
+source ../modules.txt
 
 # OpenMP settings
 export OMP_NUM_THREADS=1
@@ -32,16 +33,18 @@ OUTPUT_FREQ=20
 
 mkdir -p ../results
 
-# Dynamically get the total number of CPUs available on all up nodes
-TOTAL_CPUS=$(sinfo -h -o "%C" -N -e --partition=cpubase_bycore_b1 | awk -F '/' '{used=$2; idle=$3; other=$4; avail=$5} END{print $2+$3+$4+$5}')
-# Fallback if the above fails, you can manually set TOTAL_CPUS
-if [ -z "$TOTAL_CPUS" ]; then
-    TOTAL_CPUS=18
-fi
-echo "Detected total available CPUs: $TOTAL_CPUS"
+# Use the number of tasks allocated by SLURM
+TOTAL_CPUS=${SLURM_NTASKS:-18}
+echo "Using $TOTAL_CPUS total CPUs/tasks"
 
-# Strong scaling loop: 1 → TOTAL_CPUS
-for NTASKS in $(seq 1 $TOTAL_CPUS); do
+# Strong scaling loop: powers of 2 up to TOTAL_CPUS for efficiency
+# This tests 1, 2, 4, 8, 16 tasks (much faster than testing every single value)
+for NTASKS in 1 2 4 8 16; do
+    # Skip if NTASKS exceeds available resources
+    if [ $NTASKS -gt $TOTAL_CPUS ]; then
+        echo "Skipping $NTASKS tasks (exceeds available $TOTAL_CPUS)"
+        continue
+    fi
     echo ""
     echo "Running with $NTASKS MPI tasks..."
 
