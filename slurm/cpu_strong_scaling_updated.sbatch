@@ -3,9 +3,12 @@
 #SBATCH --output=../results/cpu_strong_%j.out
 #SBATCH --error=../results/cpu_strong_%j.err
 #SBATCH --partition=cpubase_bycore_b1
-#SBATCH --nodes=1
-#SBATCH --ntasks=18
+#SBATCH --nodes=1-5
+#SBATCH --ntasks=10
+#SBATCH --ntasks-per-node=2
 #SBATCH --cpus-per-task=1
+#SBATCH --exclude=node2,node7,node8,gpu-node1,gpu-node2
+#SBATCH --exclusive
 #SBATCH --time=00:30:00
 
 # Load modules
@@ -33,12 +36,12 @@ OUTPUT_FREQ=20
 mkdir -p ../results
 
 # Use the number of tasks allocated by SLURM
-TOTAL_CPUS=${SLURM_NTASKS:-18}
-echo "Using $TOTAL_CPUS total CPUs/tasks"
+TOTAL_CPUS=${SLURM_NTASKS:-10}
+echo "Using $TOTAL_CPUS total CPUs/tasks across $SLURM_JOB_NUM_NODES nodes"
 
-# Strong scaling loop: powers of 2 up to TOTAL_CPUS for efficiency
-# This tests 1, 2, 4, 8, 16 tasks (much faster than testing every single value)
-for NTASKS in 1 2 4 8 16; do
+# Strong scaling loop: powers of 2 up to TOTAL_CPUS
+# Tests: 1, 2, 4, 8 tasks (plus 10 to use all available)
+for NTASKS in 1 2 4 8 10; do
     # Skip if NTASKS exceeds available resources
     if [ $NTASKS -gt $TOTAL_CPUS ]; then
         echo "Skipping $NTASKS tasks (exceeds available $TOTAL_CPUS)"
