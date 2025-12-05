@@ -3,9 +3,9 @@
 #SBATCH --output=../results/cpu_strong_%j.out
 #SBATCH --error=../results/cpu_strong_%j.err
 #SBATCH --partition=cpubase_bycore_b1
+#SBATCH --nodes=1
 #SBATCH --ntasks=18
 #SBATCH --cpus-per-task=1
-#SBATCH --exclude=node2,node7,node8
 #SBATCH --time=00:30:00
 
 # Load modules
